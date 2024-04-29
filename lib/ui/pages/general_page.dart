@@ -6,84 +6,87 @@ class GeneralPage extends StatelessWidget {
   final Function? onBackButtonPressed;
   final Widget? child;
   final Color? backColor;
+  final FloatingActionButton? floatingActionButton;
 
   GeneralPage(
       {this.title = "Title",
       this.subtitle = "subtitle",
       this.onBackButtonPressed,
       this.child,
-      this.backColor});
+      this.backColor,
+      this.floatingActionButton});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Stack(
-      children: [
-        Container(
-          color: Colors.white,
-        ),
-        SafeArea(
-            child: Container(
-          color: backColor ?? Colors.white,
-          // color: Colors.black,
-        )),
-        SafeArea(
-          child: ListView(
-            children: [
-              Column(
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: defaultMargin),
-                    width: double.infinity,
-                    height: 100,
-                    color: "E5E5E5".toColor(),
-                    child: Row(
-                      children: [
-                        onBackButtonPressed != null
-                            ? GestureDetector(
-                                onTap: () {
-                                  if (onBackButtonPressed != null) {
-                                    onBackButtonPressed!();
-                                  }
-                                },
-                                child: Container(
-                                  width: 24,
-                                  height: 24,
-                                  margin: EdgeInsets.only(right: 26),
-                                  decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                          image: AssetImage(
-                                              'assets/back_arrow.png'))),
-                                ),
-                              )
-                            : SizedBox(),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              title,
-                              style: GoogleFonts.poppins(
-                                  fontSize: 22, fontWeight: FontWeight.w500),
-                            ),
-                            Text(
-                              subtitle,
-                              style: GoogleFonts.poppins(
-                                  color: greyColor,
-                                  fontWeight: FontWeight.w500),
-                            )
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                  child ?? SizedBox()
-                ],
-              ),
-            ],
+      body: Stack(
+        children: [
+          Container(
+            color: Colors.white,
           ),
-        ),
-      ],
-    ));
+          SafeArea(
+              child: Container(
+            color: backColor ?? Colors.white,
+            // color: Colors.black,
+          )),
+          SafeArea(
+            child: ListView(
+              children: [
+                Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: defaultMargin),
+                      width: double.infinity,
+                      height: 100,
+                      color: "E5E5E5".toColor(),
+                      child: Row(
+                        children: [
+                          onBackButtonPressed != null
+                              ? GestureDetector(
+                                  onTap: () {
+                                    if (onBackButtonPressed != null) {
+                                      onBackButtonPressed!();
+                                    }
+                                  },
+                                  child: Container(
+                                    width: 24,
+                                    height: 24,
+                                    margin: EdgeInsets.only(right: 26),
+                                    decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                            image: AssetImage(
+                                                'assets/back_arrow.png'))),
+                                  ),
+                                )
+                              : SizedBox(),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                title,
+                                style: GoogleFonts.poppins(
+                                    fontSize: 22, fontWeight: FontWeight.w500),
+                              ),
+                              Text(
+                                subtitle,
+                                style: GoogleFonts.poppins(
+                                    color: greyColor,
+                                    fontWeight: FontWeight.w500),
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                    child ?? SizedBox()
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ), floatingActionButton: floatingActionButton,
+    );
   }
 }

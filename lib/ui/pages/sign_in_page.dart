@@ -8,12 +8,41 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
-  TextEditingController usernameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
 
   bool _isObscure = true;
   bool _isLoading = false;
   Icon _passwordIcon = const Icon(Icons.visibility);
+
+  Future<void> _signIn() async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      await supabase.auth.signInWithPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+      Get.to(MainPage());
+    } on AuthException catch (error) {
+      context.showErrorSnackBar(message: error.message);
+    } catch (_) {
+      context.showErrorSnackBar(message: unexpectedErrorMessage);
+    }
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +62,7 @@ class _SignInPageState extends State<SignInPage> {
             width: double.infinity,
             margin: EdgeInsets.fromLTRB(defaultMargin, 26, defaultMargin, 6),
             child: Text(
-              'Username',
+              'Email',
               style: blackFontStyle2,
             ),
           ),
@@ -45,11 +74,11 @@ class _SignInPageState extends State<SignInPage> {
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: Colors.black)),
             child: TextField(
-              controller: usernameController,
+              controller: _emailController,
               decoration: InputDecoration(
                   border: InputBorder.none,
                   hintStyle: greyFontStyle,
-                  hintText: 'Masukkan username'),
+                  hintText: 'Masukkan email'),
             ),
           ),
           Container(
@@ -68,7 +97,7 @@ class _SignInPageState extends State<SignInPage> {
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.black)),
               child: TextField(
-                controller: passwordController,
+                controller: _passwordController,
                 obscureText: _isObscure,
                 decoration: InputDecoration(
                   border: InputBorder.none,
@@ -100,23 +129,7 @@ class _SignInPageState extends State<SignInPage> {
             child: _isLoading
                 ? SpinKitFadingCircle(size: 45, color: mainColor)
                 : ElevatedButton(
-                    onPressed: () async {
-                      final response = await SupabaseConfig.supabase
-                          .from('users')
-                          .select('*')
-                          .eq('username', usernameController.text.trim())
-                          .eq(
-                              'password',
-                              PasswordHash.generateSha1(
-                                  passwordController.text.trim()));
-                      if (response.isNotEmpty) {
-                        Get.to(MainPage());
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text('Username / password salah')));
-                      }
-                      log("responseLogin:  $response");
-                    },
+                    onPressed: _signIn,
                     style: ElevatedButton.styleFrom(
                         backgroundColor: mainColor,
                         shape: RoundedRectangleBorder(

@@ -1,56 +1,44 @@
 part of 'pages.dart';
 
-class SignUpPage extends StatefulWidget {
-  const SignUpPage({Key? key}) : super(key: key);
+class AddProductPage extends StatefulWidget {
+  const AddProductPage({super.key});
 
   @override
-  State<SignUpPage> createState() => _SignUpPageState();
+  State<AddProductPage> createState() => _AddProductPageState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _AddProductPageState extends State<AddProductPage> {
   TextEditingController _nameController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _usernameController = TextEditingController();
-  TextEditingController _phoneNumberController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
-  TextEditingController _confirmPasswordController = TextEditingController();
+  TextEditingController _descriptionController = TextEditingController();
+  TextEditingController _quantityController = TextEditingController();
+
+  String _selectedItemTransactionType = '---Pilih Jenis Transaksi---';
+  String _selectedItemCategory = '---Pilih Kategori---';
+
+  List<String> _optionsCategory = [
+    '---Pilih Kategori---',
+    'ATK',
+    'Alat Rumah Tangga',
+    'Transportasi'
+  ];
+
+  List<String> _optionsTransactionType = [
+    '---Pilih Jenis Transaksi---',
+    'Gratis',
+    'Barter',
+    'Berbayar'
+  ];
 
   bool _isObscure = true;
   bool _isLoading = false;
-  Icon _passwordIcon = const Icon(Icons.visibility);
-
-  Future<void> _signUp() async {    
-    final email = _emailController.text;
-    final password = _passwordController.text;
-    final username = _usernameController.text;
-    final name = _nameController.text;
-    final phoneNumber = _phoneNumberController.text;
-    try {
-      await supabase.auth.signUp(email: email, password: password, data: {
-        'name': name,
-        'username': username,
-        'phone_number': phoneNumber
-      });
-      Get.to(MainPage());
-    } on AuthException catch (error) {
-      context.showErrorSnackBar(message: error.message);
-    } catch (error) {
-      context.showErrorSnackBar(message: unexpectedErrorMessage);
-    }
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return GeneralPage(
-      title: 'Register',
-      subtitle: 'Rukun Sesama',
+      title: 'Produk',
+      subtitle: 'Tambah Produk',
       onBackButtonPressed: () {
-        Get.to(SignInPage());
+        Navigator.pop(context);
       },
       child: Column(
         children: [
@@ -74,7 +62,7 @@ class _SignUpPageState extends State<SignUpPage> {
             width: double.infinity,
             margin: EdgeInsets.fromLTRB(defaultMargin, 16, defaultMargin, 6),
             child: Text(
-              'Nama',
+              'Nama Produk',
               style: blackFontStyle2,
             ),
           ),
@@ -90,14 +78,14 @@ class _SignUpPageState extends State<SignUpPage> {
               decoration: InputDecoration(
                   border: InputBorder.none,
                   hintStyle: greyFontStyle,
-                  hintText: 'Masukkan nama lengkap'),
+                  hintText: 'Masukkan nama produk'),
             ),
           ),
           Container(
             width: double.infinity,
             margin: EdgeInsets.fromLTRB(defaultMargin, 16, defaultMargin, 6),
             child: Text(
-              'Email',
+              'Kategori ',
               style: blackFontStyle2,
             ),
           ),
@@ -108,19 +96,29 @@ class _SignUpPageState extends State<SignUpPage> {
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: Colors.black)),
-            child: TextField(
-              controller: _emailController,
-              decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintStyle: greyFontStyle,
-                  hintText: 'Contoh : contoh@gmail.com'),
+            child: DropdownButton<String>(
+              isExpanded: true,
+              underline: SizedBox(),
+              value: _selectedItemCategory,
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedItemCategory = newValue!;
+                });
+              },
+              items: _optionsCategory
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
             ),
           ),
           Container(
             width: double.infinity,
             margin: EdgeInsets.fromLTRB(defaultMargin, 16, defaultMargin, 6),
             child: Text(
-              'Username',
+              'Jenis Pembayaran',
               style: blackFontStyle2,
             ),
           ),
@@ -131,42 +129,54 @@ class _SignUpPageState extends State<SignUpPage> {
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: Colors.black)),
-            child: TextField(
-              controller: _usernameController,
-              decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintStyle: greyFontStyle,
-                  hintText: 'Masukkan username'),
-            ),
-          ),
-          Container(
-            width: double.infinity,
-            margin: EdgeInsets.fromLTRB(defaultMargin, 16, defaultMargin, 6),
-            child: Text(
-              'No. Hp',
-              style: blackFontStyle2,
-            ),
-          ),
-          Container(
-            width: double.infinity,
-            margin: EdgeInsets.symmetric(horizontal: defaultMargin),
-            padding: EdgeInsets.symmetric(horizontal: 10),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.black)),
-            child: TextField(
-              controller: _phoneNumberController,
-              decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintStyle: greyFontStyle,
-                  hintText: 'Contoh : 082312xxx'),
+            child: DropdownButton<String>(
+              isExpanded: true,
+              underline: SizedBox(),
+              value: _selectedItemTransactionType,
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedItemTransactionType = newValue!;
+                });
+              },
+              items: _optionsTransactionType
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
             ),
           ),
           Container(
             width: double.infinity,
             margin: EdgeInsets.fromLTRB(defaultMargin, 26, defaultMargin, 6),
             child: Text(
-              'Password',
+              'Deskripsi',
+              style: blackFontStyle2,
+            ),
+          ),
+          Container(
+            width: double.infinity,
+            margin: EdgeInsets.symmetric(horizontal: defaultMargin),
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            height: 100,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.black)),
+            child: TextField(
+              controller: _descriptionController,
+              obscureText: _isObscure,
+              decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintStyle: greyFontStyle,
+                  hintText: 'Deskripsi barang'),
+            ),
+          ),
+          Container(
+            width: double.infinity,
+            margin: EdgeInsets.fromLTRB(defaultMargin, 26, defaultMargin, 6),
+            child: Text(
+              'Jumlah',
               style: blackFontStyle2,
             ),
           ),
@@ -178,83 +188,61 @@ class _SignUpPageState extends State<SignUpPage> {
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.black)),
               child: TextField(
-                controller: _passwordController,
-                obscureText: _isObscure,
+                controller: _quantityController,
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   hintStyle: greyFontStyle,
-                  hintText: 'Masukkan password',
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _isObscure = !_isObscure;
-                        if (_isObscure) {
-                          _passwordIcon = const Icon(Icons.visibility);
-                        } else {
-                          _passwordIcon = const Icon(
-                            Icons.visibility_off,
-                            color: Colors.blue,
-                          );
-                        }
-                      });
-                    },
-                    icon: _passwordIcon,
-                  ),
+                  hintText: 'Jumlah barang',
                 ),
               )),
           Container(
             width: double.infinity,
-            margin: EdgeInsets.fromLTRB(defaultMargin, 26, defaultMargin, 6),
-            child: Text(
-              'Konfirmasi Password',
-              style: blackFontStyle2,
+            margin: EdgeInsets.only(top: 24),
+            height: 45,
+            padding: EdgeInsets.symmetric(horizontal: defaultMargin),
+            child: ElevatedButton(
+              onPressed: () async {
+                final addProduct =
+                    await supabase.from('products').insert({
+                  'user_id': 1,
+                  'name': _nameController.text.trim(),
+                  'description': _descriptionController.text.trim(),
+                  'quantity': _quantityController.text.trim().toInt()
+                });
+                if(addProduct.isBlank) {
+                  log("Success");
+                } else {
+                  log('Gagal');
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: mainColor,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8))),
+              child: Text(
+                'Simpan',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ),
           ),
-          Container(
-              width: double.infinity,
-              margin: EdgeInsets.symmetric(horizontal: defaultMargin),
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.black)),
-              child: TextField(
-                controller: _confirmPasswordController,
-                obscureText: _isObscure,
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintStyle: greyFontStyle,
-                  hintText: 'Ketik ulang password',
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _isObscure = !_isObscure;
-                        if (_isObscure) {
-                          _passwordIcon = const Icon(Icons.visibility);
-                        } else {
-                          _passwordIcon = const Icon(
-                            Icons.visibility_off,
-                            color: Colors.blue,
-                          );
-                        }
-                      });
-                    },
-                    icon: _passwordIcon,
-                  ),
-                ),
-              )),
           Container(
             width: double.infinity,
             margin: EdgeInsets.only(top: 24, bottom: 24),
             height: 45,
             padding: EdgeInsets.symmetric(horizontal: defaultMargin),
             child: ElevatedButton(
-              onPressed: _isLoading ? null : _signUp,
+              onPressed: () {
+                // Get.to(SignInPage());
+              },
               style: ElevatedButton.styleFrom(
-                  backgroundColor: mainColor,
+                  backgroundColor: greyColor,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8))),
               child: Text(
-                'Register',
+                'Batalkan',
                 style: GoogleFonts.poppins(
                   color: Colors.white,
                   fontWeight: FontWeight.w500,
