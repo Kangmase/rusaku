@@ -119,7 +119,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         width: double.infinity,
                         height: 70,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Get.to(AccountPage());
+                          },
                           style: ElevatedButton.styleFrom(
                               backgroundColor: "E5E5E5".toColor(),
                               shape: RoundedRectangleBorder(

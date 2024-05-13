@@ -6,12 +6,6 @@ part of 'pages.dart';
 class ChatPage extends StatefulWidget {
   const ChatPage({Key? key}) : super(key: key);
 
-  static Route<void> route() {
-    return MaterialPageRoute(
-      builder: (context) => const ChatPage(),
-    );
-  }
-
   @override
   State<ChatPage> createState() => _ChatPageState();
 }

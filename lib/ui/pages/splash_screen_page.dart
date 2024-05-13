@@ -8,16 +8,19 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  //method yang pertama kali dijalankan
   @override
   void initState() {
     super.initState();
     _redirect();
   }
 
+  //Pengecekan sudah login atau belum
   Future<void> _redirect() async {
     // await for for the widget to mount
     await Future.delayed(Durations.extralong2);
 
+    //pengecekan session
     final session = supabase.auth.currentSession;
     if (session == null) {
       Get.to(SignInPage());

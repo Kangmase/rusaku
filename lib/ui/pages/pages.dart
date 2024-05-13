@@ -1,10 +1,13 @@
+import 'dart:async';
 import 'dart:developer';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:getwidget/getwidget.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:rusa_application/models/models.dart';
 import 'package:rusa_application/shared/shared.dart';
@@ -27,3 +30,6 @@ part 'change_profile.dart';
 part 'product_page.dart';
 part 'add_product_page.dart';
 part 'chat_page.dart';
+part '../widgets/avatar.dart';
+part 'account_page.dart';
+part '../widgets/product_image.dart';

@@ -11,6 +11,7 @@ class _AddProductPageState extends State<AddProductPage> {
   TextEditingController _nameController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   TextEditingController _quantityController = TextEditingController();
+  TextEditingController _priceController = TextEditingController();
 
   String _selectedItemTransactionType = '---Pilih Jenis Transaksi---';
   String _selectedItemCategory = '---Pilih Kategori---';
@@ -165,7 +166,6 @@ class _AddProductPageState extends State<AddProductPage> {
                 border: Border.all(color: Colors.black)),
             child: TextField(
               controller: _descriptionController,
-              obscureText: _isObscure,
               decoration: InputDecoration(
                   border: InputBorder.none,
                   hintStyle: greyFontStyle,
@@ -197,24 +197,34 @@ class _AddProductPageState extends State<AddProductPage> {
               )),
           Container(
             width: double.infinity,
+            margin: EdgeInsets.fromLTRB(defaultMargin, 26, defaultMargin, 6),
+            child: Text(
+              'Harga',
+              style: blackFontStyle2,
+            ),
+          ),
+          Container(
+              width: double.infinity,
+              margin: EdgeInsets.symmetric(horizontal: defaultMargin),
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.black)),
+              child: TextField(
+                controller: _priceController,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintStyle: greyFontStyle,
+                  hintText: 'Harga barang',
+                ),
+              )),
+          Container(
+            width: double.infinity,
             margin: EdgeInsets.only(top: 24),
             height: 45,
             padding: EdgeInsets.symmetric(horizontal: defaultMargin),
             child: ElevatedButton(
-              onPressed: () async {
-                final addProduct =
-                    await supabase.from('products').insert({
-                  'user_id': 1,
-                  'name': _nameController.text.trim(),
-                  'description': _descriptionController.text.trim(),
-                  'quantity': _quantityController.text.trim().toInt()
-                });
-                if(addProduct.isBlank) {
-                  log("Success");
-                } else {
-                  log('Gagal');
-                }
-              },
+              onPressed: () => _uploadProduct(),
               style: ElevatedButton.styleFrom(
                   backgroundColor: mainColor,
                   shape: RoundedRectangleBorder(
@@ -235,7 +245,7 @@ class _AddProductPageState extends State<AddProductPage> {
             padding: EdgeInsets.symmetric(horizontal: defaultMargin),
             child: ElevatedButton(
               onPressed: () {
-                // Get.to(SignInPage());
+                Get.to(ProductPage());
               },
               style: ElevatedButton.styleFrom(
                   backgroundColor: greyColor,
@@ -253,5 +263,93 @@ class _AddProductPageState extends State<AddProductPage> {
         ],
       ),
     );
+  }
+
+  void _uploadProduct() async {
+    final productName = _nameController.text;
+    final productCategory = _selectedItemCategory;
+    final productDescription = _descriptionController.text;
+    final productQuantity = _quantityController.text;
+    final productPrice = _priceController.text;
+    final myUserId = supabase.auth.currentUser!.id;
+    if (productName.isEmpty) {
+      return;
+    }
+    _nameController.clear();
+    _descriptionController.clear();
+    _quantityController.clear();
+    try {
+      await supabase.from('products').insert({
+        'profile_id': myUserId,
+        'name': productName,
+        'category': productCategory,
+        'description': productDescription,
+        'quantity': productQuantity.toInt(),
+        'price': productPrice.toInt()
+      });
+      Get.to(ProductPage());
+    } on PostgrestException catch (error) {
+      context.showErrorSnackBar(message: error.message);
+    } catch (_) {
+      context.showErrorSnackBar(message: unexpectedErrorMessage);
+    }
+  }
+
+  Future<void> _uploadImage() async {
+    final picker = ImagePicker();
+    final imageFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 300,
+      maxHeight: 300,
+    );
+    if (imageFile == null) {
+      return;
+    }
+    setState(() => _isLoading = true);
+
+    try {
+      final bytes = await imageFile.readAsBytes();
+      final fileExt = imageFile.path.split('.').last;
+      final fileName = '${DateTime.now().toIso8601String()}.$fileExt';
+      final filePath = fileName;
+      await supabase.storage.from('products').uploadBinary(
+            filePath,
+            bytes,
+            fileOptions: FileOptions(contentType: imageFile.mimeType),
+          );
+      final imageUrlResponse =
+          await supabase.storage.from('products').getPublicUrl(fileName);
+      // widget.onUpload(imageUrlResponse);
+    } on StorageException catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error.message),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } catch (error) {
+      if (mounted) {
+        log("error: $error");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Unexpected error occurred'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    }
+
+    setState(() => _isLoading = false);
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _descriptionController.dispose();
+    _quantityController.dispose();
+    _priceController.dispose();
+    super.dispose();
   }
 }

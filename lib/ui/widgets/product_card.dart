@@ -79,10 +79,6 @@ class ProductCard extends StatelessWidget {
               ],
             ),
           ),
-          // Padding(
-          //   padding: EdgeInsets.only(left: 12),
-          //   child: RatingStars(food.rate!),
-          // ),
         ],
       ),
     );
